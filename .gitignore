@@ -1,0 +1,23 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Runtime SQLite database & WAL sidecars (keep code clean; DB is auto-initialized on startup)
+data/
+*.db
+*.db-shm
+*.db-wal
+*.ctl
+.env
+.env.*
+
+# OS / Editor artifacts
+.DS_Store
+*.log
+*.swp

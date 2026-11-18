@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThreatLocker® Zero Trust Endpoint Protection Platform</title>
+  <style>
+    :root {
+      --blue-black: #0b1318;
+      --blue-black-alt: #071b2a;
+      --dark-navy: #0b223f;
+      --true-navy: #132d51;
+      --deep-sky: #0098d6;
+      --medium-sky: #27b7eb;
+      --light-sky: #37c6f4;
+      --royal-blue: #00619f;
+      --card-bg: #0f1d29;
+      --card-border: #1d354d;
+      --text-main: #f4f7fa;
+      --text-muted: #96a8b8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #0b223f 0%, #071b2a 45%, #0b1318 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: rgba(7, 27, 42, 0.96);
+      border-right: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+    }
+    .brand {
+      padding: 22px 20px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--deep-sky), var(--royal-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 20px;
+      box-shadow: 0 0 18px rgba(0, 152, 214, 0.45);
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      color: #fff;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--light-sky);
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-top: 2px;
+    }
+
+    .nav-list {
+      padding: 14px 10px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .nav-section {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      padding: 10px 12px 4px;
+      font-weight: 700;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 14px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: #c7d6e4;
+      transition: all 0.18s ease;
+      border: 1px solid transparent;
+      gap: 8px;
+    }
+    .nav-item:hover {
+      background: rgba(0, 152, 214, 0.12);
+      color: #fff;
+    }
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(0, 152, 214, 0.25), rgba(0, 97, 159, 0.1));
+      color: #fff;
+      border-color: rgba(55, 198, 244, 0.4);
+      font-weight: 600;
+    }
+    .nav-badge {
+      background: rgba(55, 198, 244, 0.18);
+      color: var(--light-sky);
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .nav-badge.warn {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+    }
+
+    .sidebar-footer {
+      padding: 14px 16px;
+      border-top: 1px solid var(--card-border);
+      background: rgba(11, 19, 24, 0.7);
+      font-size: 12px;
+    }
+    .mode-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 99px;
+      background: rgba(0, 152, 214, 0.22);
+      border: 1px solid #37c6f4;
+      color: #37c6f4;
+      font-weight: 700;
+      font-size: 11px;
+      width: 100%;
+      justify-content: center;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    /* Main Content */
+    .main {
+      margin-left: 280px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .topbar {
+      min-height: 68px;
+      padding: 10px 28px;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(11, 19, 24, 0.88);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .topbar-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Language Switcher */
+    .lang-switcher {
+      display: inline-flex;
+      align-items: center;
+      background: #071118;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 4px;
+    }
+    .lang-btn {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .lang-btn:hover {
+      color: #fff;
+    }
+    .lang-btn.active {
+      background: linear-gradient(135deg, var(--deep-sky), var(--royal-blue));
+      color: #fff;
+      box-shadow: 0 0 10px rgba(0, 152, 214, 0.35);
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: var(--true-navy);
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:hover { filter: brightness(1.15); border-color: var(--light-sky); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--deep-sky), var(--royal-blue));
+      border-color: var(--light-sky);
+    }
+    .btn-success {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      color: #34d399;
+    }
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #f87171;
+    }
+    .btn-warn {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: #f59e0b;
+      color: #fbbf24;
+    }
+
+    /* Full SHA-256 cell & Copy button */
+    .sha256-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 280px;
+      max-width: 440px;
+    }
+    .sha256-full {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 11px;
+      color: #93c5fd;
+      background: #071118;
+      border: 1px solid rgba(55, 198, 244, 0.25);
+      border-radius: 6px;
+      padding: 5px 8px;
+      word-break: break-all;
+      user-select: all;
+      line-height: 1.35;
+      flex: 1;
+    }
+    .btn-copy-hash {
+      padding: 5px 9px;
+      border-radius: 6px;
+      border: 1px solid rgba(55, 198, 244, 0.4);
+      background: rgba(0, 152, 214, 0.16);
+      color: var(--light-sky);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .btn-copy-hash:hover {
+      background: var(--deep-sky);
+      color: #fff;
+    }
+    .btn-copy-hash.copied {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    .content {
+      padding: 26px 28px 60px;
+    }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--deep-sky), var(--light-sky));
+    }
+    .kpi-label {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      font-weight: 600;
+    }
+    .kpi-value {
+      font-size: 29px;
+      font-weight: 800;
+      margin: 8px 0 4px;
+      color: #fff;
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--light-sky);
+    }
+
+    /* Section Cards & Tables */
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 22px;
+      overflow-x: auto;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-subtitle {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    input[type="text"], select, textarea {
+      background: #08121a;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus {
+      border-color: var(--light-sky);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      text-align: left;
+      padding: 11px 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(29, 53, 77, 0.55);
+      vertical-align: middle;
+    }
+    tr:hover td {
+      background: rgba(0, 152, 214, 0.05);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .badge-allowed, .badge-compliant, .badge-approved, .badge-online {
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .badge-ringfenced, .badge-audit {
+      background: rgba(55, 198, 244, 0.16);
+      color: var(--light-sky);
+      border: 1px solid rgba(55, 198, 244, 0.35);
+    }
+    .badge-pending, .badge-warning {
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+    .badge-blocked, .badge-critical, .badge-drift_detected, .badge-denied {
+      background: rgba(239, 68, 68, 0.18);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 11.5px;
+      color: #93c5fd;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 18px;
+    }
+
+    .policy-card {
+      background: rgba(11, 24, 36, 0.9);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .policy-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .policy-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .chat-box {
+      background: #071118;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 18px;
+      min-height: 220px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      font-size: 13.5px;
+      color: #e2ecf5;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0b223f;
+      border: 1px solid var(--light-sky);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 9999;
+      display: none;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: var(--true-navy);
+      border: 1px solid var(--light-sky);
+      color: #fff;
+      border-radius: 8px;
+      padding: 6px 11px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.22s ease;
+        width: 270px;
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .main {
+        margin-left: 0;
+      }
+      .mobile-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .topbar {
+        height: auto;
+        padding: 12px 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .topbar-actions {
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .content {
+        padding: 16px 12px 50px;
+      }
+      .panel {
+        padding: 14px;
+        overflow-x: auto;
+      }
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      table {
+        min-width: 680px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">TL</div>
+      <div>
+        <div class="brand-title">THREATLOCKER®</div>
+        <div class="brand-sub" id="brand-subtitle">Plataforma Zero Trust</div>
+      </div>
+    </div>
+
+    <div class="nav-list">
+      <div class="nav-section" id="nav-sec-cmd">Comando Zero Trust</div>
+      <div class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard', this)">
+        <span id="nav-lbl-dashboard">1. Visão Geral & ROI</span>
+        <span class="nav-badge" id="nav-ep-count">2</span>
+      </div>
+      <div class="nav-item" data-tab="allowlisting" onclick="switchTab('allowlisting', this)">
+        <span id="nav-lbl-allowlisting">2. Lista de Permissões (Allowlisting)</span>
+        <span class="nav-badge" id="nav-app-count">0</span>
+      </div>
+      <div class="nav-item" data-tab="ringfencing" onclick="switchTab('ringfencing', this)">
+        <span id="nav-lbl-ringfencing">3. Cercamento Digital (Ringfencing™)</span>
+        <span class="nav-badge" id="nav-rf-count">4</span>
+      </div>
+      <div class="nav-item" data-tab="aicontrol" onclick="switchTab('aicontrol', this)">
+        <span id="nav-lbl-aicontrol">4. Controle de IA Zero Trust</span>
+        <span class="nav-badge" id="nav-ai-count">4</span>
+      </div>
+
+      <div class="nav-section" id="nav-sec-infra">Infraestrutura & Acesso</div>
+      <div class="nav-item" data-tab="network" onclick="switchTab('network', this)">
+        <span id="nav-lbl-network">5. Controle de Rede (ZTNA)</span>
+        <span class="nav-badge" id="nav-net-count">5</span>
+      </div>
+      <div class="nav-item" data-tab="storage" onclick="switchTab('storage', this)">
+        <span id="nav-lbl-storage">6. Controle de Armazenamento (USB/FS)</span>
+        <span class="nav-badge" id="nav-st-count">4</span>
+      </div>
+      <div class="nav-item" data-tab="elevation" onclick="switchTab('elevation', this)">
+        <span id="nav-lbl-elevation">7. Controle de Elevação (JIT)</span>
+        <span class="nav-badge warn" id="nav-elev-count">1</span>
+      </div>
+      <div class="nav-item" data-tab="dac" onclick="switchTab('dac', this)">
+        <span id="nav-lbl-dac">8. Gerenciador de Configuração DAC</span>
+        <span class="nav-badge" id="nav-dac-pct">95%</span>
+      </div>
+
+      <div class="nav-section" id="nav-sec-secops">Operações de Segurança & Resposta</div>
+      <div class="nav-item" data-tab="audit" onclick="switchTab('audit', this)">
+        <span id="nav-lbl-audit">9. Auditoria Unificada & EDR</span>
+      </div>
+      <div class="nav-item" data-tab="agents" onclick="switchTab('agents', this)">
+        <span id="nav-lbl-agents">10. Agentes Multi-SO (Lin/Win)</span>
+      </div>
+      <div class="nav-item" data-tab="cyberhero" onclick="switchTab('cyberhero', this)">
+        <span id="nav-lbl-cyberhero">11. Consultor IA Cyber Hero® (60s)</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="mode-pill" id="global-mode-pill">● BLOQUEIO EM PRODUÇÃO (ATIVO)</div>
+      <div id="global-mode-sub" style="text-align:center; color: var(--text-muted); font-size:11px;">
+        Negar por Padrão • Aplicação em Tempo Real Ativa
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+        <div class="topbar-title" id="current-tab-title">Central de Comando Zero Trust ThreatLocker®</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="lang-switcher" role="group" aria-label="Language Switcher">
+          <button type="button" class="lang-btn active" id="btn-lang-pt" onclick="setLanguage('pt-BR')">🇧🇷 PT-BR</button>
+          <button type="button" class="lang-btn" id="btn-lang-en" onclick="setLanguage('en-US')">🇺🇸 EN-US</button>
+        </div>
+        <button class="btn btn-danger" id="btn-sim-zeroday" onclick="simulateAttack('ransomware_zero_day')">⚡ Testar Bloqueio Zero-Day</button>
+        <button class="btn btn-danger" id="btn-sim-ringfence" onclick="simulateAttack('ringfence_lotl')">🛡️ Testar Bloqueio Ringfence</button>
+        <button class="btn btn-danger" id="btn-sim-ai" onclick="simulateAttack('ai_agent_escape')">🤖 Testar Contenção de IA</button>
+        <button class="btn btn-primary" id="btn-sync-now" onclick="refreshAll()">↻ Sincronizar Agora</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- TAB 1: DASHBOARD -->
+      <section id="tab-dashboard" class="tab-pane active">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label" id="kpi-lbl-endpoints">Endpoints Protegidos (Lin/Win)</div>
+            <div class="kpi-value" id="kpi-endpoints">0</div>
+            <div class="kpi-sub" id="kpi-endpoints-sub">Agentes sincronizados em tempo real</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label" id="kpi-lbl-apps">Catálogo SHA-256 (Modo Aprendizado)</div>
+            <div class="kpi-value" id="kpi-apps">0</div>
+            <div class="kpi-sub" id="kpi-apps-sub">Binários inventariados no servidor</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label" id="kpi-lbl-rf">Políticas Ringfencing™ Ativas</div>
+            <div class="kpi-value" id="kpi-rf">4</div>
+            <div class="kpi-sub" id="kpi-rf-sub">Confinamento de processos e rede</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label" id="kpi-lbl-dac">Pontuação de Conformidade DAC</div>
+            <div class="kpi-value" id="kpi-dac">100%</div>
+            <div class="kpi-sub" id="kpi-dac-sub">Defesa Contra Desconfigurações</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label" id="kpi-lbl-roi">Redução de Superfície (Forrester TEI)</div>
+            <div class="kpi-value">99%</div>
+            <div class="kpi-sub" id="kpi-roi-sub">184% ROI • Retorno em 7 meses • Zero Trust</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="dash-ep-title">🖥️ Endpoints Gerenciados (Linux & Windows)</div>
+              <div class="panel-subtitle" id="dash-ep-subtitle">Controle o modo de operação por máquina: Aprendizado, Somente Auditoria, Bloqueio Total (Enforce) ou Isolamento EDR</div>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th id="th-ep-host">Nome do Host</th>
+                <th id="th-ep-os">Sistema Operacional</th>
+                <th id="th-ep-ip">IP / Agente</th>
+                <th id="th-ep-res">CPU / RAM</th>
+                <th id="th-ep-mode">Modo Zero Trust</th>
+                <th id="th-ep-actions">Ações Rápidas</th>
+              </tr>
+            </thead>
+            <tbody id="endpoints-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="dash-stream-title">📡 Telemetria Unificada em Tempo Real (Fluxo de Auditoria & EDR)</div>
+              <div class="panel-subtitle" id="dash-stream-subtitle">Eventos recentes de Lista de Permissões, Cercamento Digital (Ringfencing™), Controle de IA, Armazenamento e Elevação</div>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th id="th-log-time">Horário</th>
+                <th id="th-log-host">Host</th>
+                <th id="th-log-mod">Módulo</th>
+                <th id="th-log-act">Ação</th>
+                <th id="th-log-proc">Processo / Binário</th>
+                <th id="th-log-det">Política / Detalhes</th>
+              </tr>
+            </thead>
+            <tbody id="recent-logs-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 2: APPLICATION ALLOWLISTING -->
+      <section id="tab-allowlisting" class="tab-pane">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="allow-title">📦 Lista de Permissões de Aplicações & Catálogo de Aprendizado</div>
+              <div class="panel-subtitle" id="allow-subtitle">Negar por padrão, permitir por exceção. Todos os executáveis do servidor foram catalogados com hash criptográfico SHA-256 completo.</div>
+            </div>
+            <div class="filter-bar">
+              <input type="text" id="app-search" placeholder="Buscar binário, caminho ou hash SHA-256..." oninput="loadApplications()" style="min-width:260px;" />
+              <select id="app-status-filter" onchange="loadApplications()">
+                <option value="all" id="opt-app-all">Todos os Status</option>
+                <option value="allowed" id="opt-app-allowed">Permitidos</option>
+                <option value="ringfenced" id="opt-app-ringfenced">Cercados (Ringfenced™)</option>
+                <option value="pending" id="opt-app-pending">Pendentes de Revisão</option>
+                <option value="blocked" id="opt-app-blocked">Bloqueados</option>
+              </select>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th id="th-app-name">Aplicação</th>
+                <th id="th-app-path">Caminho do Executável</th>
+                <th id="th-app-sha">SHA-256 Completo</th>
+                <th id="th-app-cat">Categoria / SO</th>
+                <th id="th-app-status">Status</th>
+                <th id="th-app-decision">Decisão em 1 Clique</th>
+              </tr>
+            </thead>
+            <tbody id="apps-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 3: RINGFENCING -->
+      <section id="tab-ringfencing" class="tab-pane">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="rf-title">🛡️ Cercamento Digital ThreatLocker Ringfencing™</div>
+              <div class="panel-subtitle" id="rf-subtitle">Restrinja o que aplicações aprovadas podem fazer após iniciarem: bloqueie criação de sub-shells, acesso a arquivos sensíveis e conexões externas.</div>
+            </div>
+          </div>
+          <div class="grid-2" id="ringfencing-grid"></div>
+        </div>
+      </section>
+
+      <!-- TAB 4: AI CONTROL -->
+      <section id="tab-aicontrol" class="tab-pane">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="ai-title">🤖 Controle de IA Zero Trust ThreatLocker</div>
+              <div class="panel-subtitle" id="ai-subtitle">Coloque agentes de IA para trabalhar sem perder o controle. Governe execução, acesso a pastas, rede e vinculação de tokens para Ollama, Hermes Agent e MCPs.</div>
+            </div>
+          </div>
+          <div class="grid-2" id="aicontrol-grid"></div>
+        </div>
+      </section>
+
+      <!-- TAB 5: NETWORK CONTROL -->
+      <section id="tab-network" class="tab-pane">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="net-title">🌐 Controle de Rede (Firewall de Host & ACLs Dinâmicas ZTNA)</div>
+              <div class="panel-subtitle" id="net-subtitle">Torne seus recursos de rede invisíveis para tráfego não autorizado e bloqueie movimentação lateral (SMB/RPC/Reverse Shells).</div>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th id="th-net-rule">Regra</th>
+                <th id="th-net-dir">Direção / Protocolo</th>
+                <th id="th-net-port">Porta(s)</th>
+                <th id="th-net-cidr">CIDR de Origem</th>
+                <th id="th-net-act">Ação Zero Trust</th>
+                <th id="th-net-mode">Modo</th>
+                <th id="th-net-desc">Descrição</th>
+              </tr>
+            </thead>
+            <tbody id="network-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 6: STORAGE CONTROL -->
+      <section id="tab-storage" class="tab-pane">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="st-title">💾 Controle de Armazenamento (Mídias USB, Partições & Cofres)</div>
+              <div class="panel-subtitle" id="st-subtitle">Visibilidade e bloqueio granular sobre dispositivos USB externos, partição EFI (/boot/efi) e chaves SSH contra exfiltração.</div>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th id="th-st-pol">Política</th>
+                <th id="th-st-type">Tipo de Mídia</th>
+                <th id="th-st-path">Caminho / Dispositivo</th>
+                <th id="th-st-perm">Permissão</th>
+                <th id="th-st-proc">Processos Autorizados</th>
+                <th id="th-st-mode">Modo</th>
+                <th id="th-st-act">Alterar Permissão</th>
+              </tr>
+            </thead>
+            <tbody id="storage-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 7: ELEVATION CONTROL -->
+      <section id="tab-elevation" class="tab-pane">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="elev-title">🔑 Controle de Elevação (Gestão de Acesso Privilegiado Just-In-Time)</div>
+              <div class="panel-subtitle" id="elev-subtitle">Remova privilégios permanentes de admin/root e aprove elevações temporárias por binário com auditoria completa.</div>
+            </div>
+            <button class="btn btn-primary" id="btn-elev-req" onclick="createSampleElevation()">+ Solicitar Elevação JIT</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th id="th-el-user">Usuário / Host</th>
+                <th id="th-el-cmd">Comando / Binário Solicitado</th>
+                <th id="th-el-just">Justificativa</th>
+                <th id="th-el-dur">Duração</th>
+                <th id="th-el-status">Status</th>
+                <th id="th-el-act">Ação Cyber Hero</th>
+              </tr>
+            </thead>
+            <tbody id="elevation-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 8: DAC -->
+      <section id="tab-dac" class="tab-pane">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="dac-title">⚙️ DAC — Defesa Contra Desconfigurações</div>
+              <div class="panel-subtitle" id="dac-subtitle">Monitoramento contínuo de deriva de configuração (Configuration Drift), CIS Benchmark, Firmware UEFI dbx e Hardening Linux/Windows.</div>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th id="th-dac-id">ID do Benchmark</th>
+                <th id="th-dac-ctrl">Controle de Segurança</th>
+                <th id="th-dac-cat">Categoria</th>
+                <th id="th-dac-cur">Estado Atual Observado</th>
+                <th id="th-dac-exp">Baseline Esperado</th>
+                <th id="th-dac-status">Status</th>
+              </tr>
+            </thead>
+            <tbody id="dac-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 9: UNIFIED AUDIT LOG -->
+      <section id="tab-audit" class="tab-pane">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="audit-title">📜 Registro Unificado de Auditoria & Telemetria EDR</div>
+              <div class="panel-subtitle" id="audit-subtitle">Histórico forense completo de execuções, bloqueios simulados (Modo Auditoria), violações de Cercamento Digital e eventos de armazenamento.</div>
+            </div>
+            <div class="filter-bar">
+              <input type="text" id="audit-search" placeholder="Filtrar processo, comando ou política..." oninput="loadAuditLogs()" style="min-width:250px;" />
+              <select id="audit-module-filter" onchange="loadAuditLogs()">
+                <option value="all" id="opt-aud-all">Todos os Módulos</option>
+                <option value="Application Control" id="opt-aud-app">Controle de Aplicações</option>
+                <option value="Ringfencing" id="opt-aud-rf">Cercamento Digital (Ringfencing™)</option>
+                <option value="AI Control" id="opt-aud-ai">Controle de IA</option>
+                <option value="Storage Control" id="opt-aud-st">Controle de Armazenamento</option>
+                <option value="Elevation Control" id="opt-aud-el">Controle de Elevação</option>
+                <option value="EDR" id="opt-aud-edr">EDR</option>
+              </select>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th id="th-aud-time">Data / Hora</th>
+                <th id="th-aud-host">Host</th>
+                <th id="th-aud-mod">Módulo</th>
+                <th id="th-aud-sev">Severidade</th>
+                <th id="th-aud-act">Ação Tomada</th>
+                <th id="th-aud-proc">Processo & Linha de Comando</th>
+                <th id="th-aud-det">Detalhes</th>
+              </tr>
+            </thead>
+            <tbody id="audit-full-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 10: MULTIPLATFORM AGENTS -->
+      <section id="tab-agents" class="tab-pane">
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title" id="ag-lin-title">🐧 Agente Instalável Linux (Ubuntu / Debian / RHEL / Kali)</div>
+            <p class="panel-subtitle" id="ag-lin-desc" style="margin: 8px 0 14px;">
+              Coleta inventário SHA-256 em tempo real diretamente de /proc, monitora agentes de IA (Ollama/Hermes/REA), verifica deriva DAC e sincroniza políticas a cada 30s.
+            </p>
+            <pre class="mono" id="ag-lin-code" style="background:#071118; padding:12px; border-radius:8px; overflow-x:auto; margin-bottom:14px;">curl -sL http://SEU_SERVIDOR:9443/api/agents/download/linux -o tl_agent_linux.py
+python3 tl_agent_linux.py --once</pre>
+            <a class="btn btn-primary" id="ag-lin-btn" href="/api/agents/download/linux">⬇ Baixar Agente Linux (tl_agent_linux.py)</a>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title" id="ag-win-title">🪟 Agente Instalável Windows 10/11 & Windows Server</div>
+            <p class="panel-subtitle" id="ag-win-desc" style="margin: 8px 0 14px;">
+              Disponível em PowerShell nativo (.ps1 com Authenticode + SHA-256 + Windows Defender DAC) e Python multiplataforma (.py).
+            </p>
+            <pre class="mono" id="ag-win-code" style="background:#071118; padding:12px; border-radius:8px; overflow-x:auto; margin-bottom:14px;">Invoke-WebRequest -Uri "http://SEU_SERVIDOR:9443/api/agents/download/windows-ps1" -OutFile ThreatLockerAgent.ps1
+powershell -ExecutionPolicy Bypass -File .\ThreatLockerAgent.ps1 -ServerUrl "http://SEU_SERVIDOR:9443"</pre>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <a class="btn btn-primary" id="ag-win-btn-ps1" href="/api/agents/download/windows-ps1">⬇ Baixar Agente Windows (.ps1)</a>
+              <a class="btn" id="ag-win-btn-py" href="/api/agents/download/windows-py">⬇ Baixar Agente Windows (.py)</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 11: CYBER HERO AI ADVISOR -->
+      <section id="tab-cyberhero" class="tab-pane">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="ch-title">🦸 Consultor IA Cyber Hero® (Resposta em até 60 Segundos)</div>
+              <div class="panel-subtitle" id="ch-subtitle">Suporte especializado em menos de 60 segundos: peça recomendações de políticas Ringfencing™, análise de incidentes ou revisão de conformidade.</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+            <input type="text" id="cyberhero-input" style="flex:1; min-width:260px;" value="Analise os últimos eventos de auditoria Zero Trust e recomende regras de Cercamento Digital e Hardening para este servidor." />
+            <button class="btn btn-primary" id="btn-ask-ch" onclick="askCyberHero()">Consultar Cyber Hero® IA</button>
+          </div>
+          <div class="chat-box" id="cyberhero-output">Clique em "Consultar Cyber Hero® IA" para analisar a telemetria real do servidor...</div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let currentLang = localStorage.getItem('tl_lang') || 'pt-BR';
+    let currentTabId = 'dashboard';
+    let lastOverviewData = null;
+
+    const I18N = {
+      'pt-BR': {
+        brandSubtitle: 'Plataforma Zero Trust',
+        navSecCmd: 'Comando Zero Trust',
+        navSecInfra: 'Infraestrutura & Acesso',
+        navSecSecops: 'Operações de Segurança & Resposta',
+        navDashboard: '1. Visão Geral & ROI',
+        navAllowlisting: '2. Lista de Permissões (Allowlisting)',
+        navRingfencing: '3. Cercamento Digital (Ringfencing™)',
+        navAicontrol: '4. Controle de IA Zero Trust',
+        navNetwork: '5. Controle de Rede (ZTNA)',
+        navStorage: '6. Controle de Armazenamento (USB/FS)',
+        navElevation: '7. Controle de Elevação (JIT)',
+        navDac: '8. Gerenciador de Configuração DAC',
+        navAudit: '9. Auditoria Unificada & EDR',
+        navAgents: '10. Agentes Multi-SO (Lin/Win)',
+        navCyberhero: '11. Consultor IA Cyber Hero® (60s)',
+        globalModePill: '● BLOQUEIO EM PRODUÇÃO (ATIVO)',
+        globalModeSub: 'Negar por Padrão • Aplicação em Tempo Real Ativa',
+        btnSimZeroday: '⚡ Testar Bloqueio Zero-Day',
+        btnSimRingfence: '🛡️ Testar Bloqueio Ringfence',
+        btnSimAi: '🤖 Testar Contenção de IA',
+        btnSyncNow: '↻ Sincronizar Agora',
+        tabTitles: {
+          dashboard: 'Central de Comando Zero Trust ThreatLocker®',
+          allowlisting: 'Lista de Permissões de Aplicações & Catálogo de Aprendizado',
+          ringfencing: 'Cercamento Digital ThreatLocker Ringfencing™ — Contenção de Processos e Rede',
+          aicontrol: 'Controle de IA Zero Trust ThreatLocker',
+          network: 'Controle de Rede — Firewall de Host & ACLs Dinâmicas ZTNA',
+          storage: 'Controle de Armazenamento — Bloqueio de USB & Partições',
+          elevation: 'Controle de Elevação — Gestão de Privilégios Just-In-Time',
+          dac: 'DAC — Defesa Contra Desconfigurações',
+          audit: 'Registro Unificado de Auditoria & Telemetria EDR',
+          agents: 'Agentes de Endpoint Multi-SO (Linux & Windows)',
+          cyberhero: 'Consultor de Segurança IA Cyber Hero®'
+        },
+        kpiLblEndpoints: 'Endpoints Protegidos (Lin/Win)',
+        kpiLblApps: 'Catálogo SHA-256 (Modo Aprendizado)',
+        kpiLblRf: 'Políticas Ringfencing™ Ativas',
+        kpiRfSub: 'Confinamento de processos e rede',
+        kpiLblDac: 'Pontuação de Conformidade DAC',
+        kpiLblRoi: 'Redução de Superfície (Forrester TEI)',
+        kpiRoiSub: '184% ROI • Retorno em 7 meses • Zero Trust',
+        dashEpTitle: '🖥️ Endpoints Gerenciados (Linux & Windows)',
+        dashEpSubtitle: 'Controle o modo de operação por máquina: Aprendizado, Somente Auditoria, Bloqueio Total (Enforce) ou Isolamento EDR',
+        thEpHost: 'Nome do Host',
+        thEpOs: 'Sistema Operacional',
+        thEpIp: 'IP / Agente',
+        thEpRes: 'CPU / RAM',
+        thEpMode: 'Modo Zero Trust',
+        thEpActions: 'Ações Rápidas',
+        dashStreamTitle: '📡 Telemetria Unificada em Tempo Real (Fluxo de Auditoria & EDR)',
+        dashStreamSubtitle: 'Eventos recentes de Lista de Permissões, Cercamento Digital (Ringfencing™), Controle de IA, Armazenamento e Elevação',
+        thLogTime: 'Horário',
+        thLogHost: 'Host',
+        thLogMod: 'Módulo',
+        thLogAct: 'Ação',
+        thLogProc: 'Processo / Binário',
+        thLogDet: 'Política / Detalhes',
+        allowTitle: '📦 Lista de Permissões de Aplicações & Catálogo de Aprendizado',
+        allowSubtitle: 'Negar por padrão, permitir por exceção. Todos os executáveis do servidor foram catalogados com hash criptográfico SHA-256 completo.',
+        appSearchPlaceholder: 'Buscar binário, caminho ou hash SHA-256...',
+        optAppAll: 'Todos os Status',
+        optAppAllowed: 'Permitidos',
+        optAppRingfenced: 'Cercados (Ringfenced™)',
+        optAppPending: 'Pendentes de Revisão',
+        optAppBlocked: 'Bloqueados',
+        thAppName: 'Aplicação',
+        thAppPath: 'Caminho do Executável',
+        thAppSha: 'SHA-256 Completo',
+        thAppCat: 'Categoria / SO',
+        thAppStatus: 'Status',
+        thAppDecision: 'Decisão em 1 Clique',
+        rfTitle: '🛡️ Cercamento Digital ThreatLocker Ringfencing™',
+        rfSubtitle: 'Restrinja o que aplicações aprovadas podem fazer após iniciarem: bloqueie criação de sub-shells, acesso a arquivos sensíveis e conexões externas.',
+        aiTitle: '🤖 Controle de IA Zero Trust ThreatLocker',
+        aiSubtitle: 'Coloque agentes de IA para trabalhar sem perder o controle. Governe execução, acesso a pastas, rede e vinculação de tokens para Ollama, Hermes Agent e MCPs.',
+        netTitle: '🌐 Controle de Rede (Firewall de Host & ACLs Dinâmicas ZTNA)',
+        netSubtitle: 'Torne seus recursos de rede invisíveis para tráfego não autorizado e bloqueie movimentação lateral (SMB/RPC/Reverse Shells).',
+        thNetRule: 'Regra',
+        thNetDir: 'Direção / Protocolo',
+        thNetPort: 'Porta(s)',
+        thNetCidr: 'CIDR de Origem',
+        thNetAct: 'Ação Zero Trust',
+        thNetMode: 'Modo',
+        thNetDesc: 'Descrição',
+        stTitle: '💾 Controle de Armazenamento (Mídias USB, Partições & Cofres)',
+        stSubtitle: 'Visibilidade e bloqueio granular sobre dispositivos USB externos, partição EFI (/boot/efi) e chaves SSH contra exfiltração.',
+        thStPol: 'Política',
+        thStType: 'Tipo de Mídia',
+        thStPath: 'Caminho / Dispositivo',
+        thStPerm: 'Permissão',
+        thStProc: 'Processos Autorizados',
+        thStMode: 'Modo',
+        thStAct: 'Alterar Permissão',
+        elevTitle: '🔑 Controle de Elevação (Gestão de Acesso Privilegiado Just-In-Time)',
+        elevSubtitle: 'Remova privilégios permanentes de admin/root e aprove elevações temporárias por binário com auditoria completa.',
+        btnElevReq: '+ Solicitar Elevação JIT',
+        thElUser: 'Usuário / Host',
+        thElCmd: 'Comando / Binário Solicitado',
+        thElJust: 'Justificativa',
+        thElDur: 'Duração',
+        thElStatus: 'Status',
+        thElAct: 'Ação Cyber Hero',
+        dacTitle: '⚙️ DAC — Defesa Contra Desconfigurações',
+        dacSubtitle: 'Monitoramento contínuo de deriva de configuração (Configuration Drift), CIS Benchmark, Firmware UEFI dbx e Hardening Linux/Windows.',
+        thDacId: 'ID do Benchmark',
+        thDacCtrl: 'Controle de Segurança',
+        thDacCat: 'Categoria',
+        thDacCur: 'Estado Atual Observado',
+        thDacExp: 'Baseline Esperado',
+        thDacStatus: 'Status',
+        auditTitle: '📜 Registro Unificado de Auditoria & Telemetria EDR',
+        auditSubtitle: 'Histórico forense completo de execuções, bloqueios simulados (Modo Auditoria), violações de Cercamento Digital e eventos de armazenamento.',
+        auditSearchPlaceholder: 'Filtrar processo, comando ou política...',
+        optAudAll: 'Todos os Módulos',
+        optAudApp: 'Controle de Aplicações',
+        optAudRf: 'Cercamento Digital (Ringfencing™)',
+        optAudAi: 'Controle de IA',
+        optAudSt: 'Controle de Armazenamento',
+        optAudEl: 'Controle de Elevação',
+        optAudEdr: 'EDR',
+        thAudTime: 'Data / Hora',
+        thAudHost: 'Host',
+        thAudMod: 'Módulo',
+        thAudSev: 'Severidade',
+        thAudAct: 'Ação Tomada',
+        thAudProc: 'Processo & Linha de Comando',
+        thAudDet: 'Detalhes',
+        agLinTitle: '🐧 Agente Instalável Linux (Ubuntu / Debian / RHEL / Kali)',
+        agLinDesc: 'Coleta inventário SHA-256 em tempo real diretamente de /proc, monitora agentes de IA (Ollama/Hermes/REA), verifica deriva DAC e sincroniza políticas a cada 30s.',
+        agLinCode: 'curl -sL http://SEU_SERVIDOR:9443/api/agents/download/linux -o tl_agent_linux.py\npython3 tl_agent_linux.py --once',
+        agLinBtn: '⬇ Baixar Agente Linux (tl_agent_linux.py)',
+        agWinTitle: '🪟 Agente Instalável Windows 10/11 & Windows Server',
+        agWinDesc: 'Disponível em PowerShell nativo (.ps1 com Authenticode + SHA-256 + Windows Defender DAC) e Python multiplataforma (.py).',
+        agWinCode: 'Invoke-WebRequest -Uri "http://SEU_SERVIDOR:9443/api/agents/download/windows-ps1" -OutFile ThreatLockerAgent.ps1\npowershell -ExecutionPolicy Bypass -File .\\ThreatLockerAgent.ps1 -ServerUrl "http://SEU_SERVIDOR:9443"',
+        agWinBtnPs1: '⬇ Baixar Agente Windows (.ps1)',
+        agWinBtnPy: '⬇ Baixar Agente Windows (.py)',
+        chTitle: '🦸 Consultor IA Cyber Hero® (Resposta em até 60 Segundos)',
+        chSubtitle: 'Suporte especializado em menos de 60 segundos: peça recomendações de políticas Ringfencing™, análise de incidentes ou revisão de conformidade.',
+        chDefaultInput: 'Analise os últimos eventos de auditoria Zero Trust e recomende regras de Cercamento Digital e Hardening para este servidor.',
+        btnAskCh: 'Consultar Cyber Hero® IA',
+        chDefaultOutput: 'Clique em "Consultar Cyber Hero® IA" para analisar a telemetria real do servidor...',
+        chLoading: '⏳ Consultando Cyber Hero® IA...',
+        chModelPrefix: 'Modelo',
+        copyHashBtn: '📋 Copiar SHA-256',
+        copiedHashBtn: '✓ Copiado!',
+        toastHashCopied: 'Hash SHA-256 completo copiado para a área de transferência!',
+        btnAllow: 'Permitir',
+        btnRingfence: 'Cercar (Ringfence)',
+        btnBlock: 'Bloquear',
+        btnLearningMode: 'Aprendizado',
+        btnAuditMode: 'Auditoria',
+        btnLockdownMode: 'Bloqueio Total',
+        btnIsolateHost: 'Isolar Host',
+        btnReintegrateHost: 'Reintegrar Host',
+        btnSimAuditMode: 'Modo Auditoria (Simulação)',
+        btnEnforceMode: 'Modo Bloqueio (Enforce)',
+        btnEnforceZt: 'Aplicar Zero Trust',
+        btnBlockAgent: 'Bloquear Agente',
+        btnReadOnly: 'Somente Leitura',
+        btnApproveJit: 'Aprovar JIT',
+        btnDeny: 'Negar',
+        lblReviewedBy: 'Revisado por',
+        lblTargets: 'Alvos',
+        lblBlockedSubprocs: 'Subprocessos Bloqueados',
+        lblProtectedFiles: 'Arquivos Protegidos',
+        lblAllowedNetwork: 'Rede / Domínios Permitidos',
+        lblInternetBlocked: 'INTERNET BLOQUEADA',
+        lblRecordedInterceptions: 'Interceptações registradas',
+        lblProcesses: 'Processos',
+        lblAuthorizedWorkspaces: 'Diretórios Autorizados',
+        lblDeniedPaths: 'Caminhos Negados (Proteção de Credenciais)',
+        lblShellExec: 'Execução de Shell',
+        lblAllowedAudited: 'Permitida (Auditada)',
+        lblBlockedFem: 'Bloqueada',
+        lblHwTokenBound: 'Vinculação a Token de Hardware',
+        lblActive: 'Ativo',
+        lblRemediation: 'Remediação',
+        lblMinutes: 'min',
+        promptJitCmd: 'Comando privilegiado para solicitar elevação JIT:',
+        defaultJitJustification: 'Diagnóstico autorizado de pacotes via painel ThreatLocker Zero Trust',
+        toastEndpointUpdated: 'Modo do endpoint atualizado para',
+        toastAppUpdated: 'Política da aplicação atualizada para',
+        toastRfUpdated: 'Política de Cercamento Digital alterada para',
+        toastAiUpdated: 'Política de Controle de IA atualizada para',
+        toastStorageUpdated: 'Política de Armazenamento atualizada para',
+        toastElevationUpdated: 'Solicitação de elevação atualizada:',
+        toastElevationCreated: 'Solicitação de elevação JIT criada!',
+        toastSimIntercepted: '🛡️ Interceptado em Modo Simulação:',
+        toastSynced: 'Telemetria Zero Trust sincronizada!'
+      },
+      'en-US': {
+        brandSubtitle: 'Zero Trust Platform',
+        navSecCmd: 'Zero Trust Command',
+        navSecInfra: 'Infrastructure & Access',
+        navSecSecops: 'SecOps & Response',
+        navDashboard: '1. Overview & ROI',
+        navAllowlisting: '2. Application Allowlisting',
+        navRingfencing: '3. Ringfencing™',
+        navAicontrol: '4. Zero Trust AI Control',
+        navNetwork: '5. Network Control (ZTNA)',
+        navStorage: '6. Storage Control (USB/FS)',
+        navElevation: '7. Elevation Control (JIT)',
+        navDac: '8. DAC Config Manager',
+        navAudit: '9. Unified Audit & EDR',
+        navAgents: '10. Multi-OS Agents (Lin/Win)',
+        navCyberhero: '11. Cyber Hero® AI (60s)',
+        globalModePill: '● PRODUCTION LOCKDOWN (ENFORCE)',
+        globalModeSub: 'Deny-by-Default • Real-Time Enforcement Active',
+        btnSimZeroday: '⚡ Test Zero-Day Block',
+        btnSimRingfence: '🛡️ Test Ringfence Block',
+        btnSimAi: '🤖 Test AI Containment',
+        btnSyncNow: '↻ Sync Now',
+        tabTitles: {
+          dashboard: 'ThreatLocker® Zero Trust Command Center',
+          allowlisting: 'Application Allowlisting & Learning Mode Catalog',
+          ringfencing: 'ThreatLocker Ringfencing™ — Process & Network Containment',
+          aicontrol: 'ThreatLocker Zero Trust AI Control',
+          network: 'Network Control — Host Firewall & Dynamic ZTNA ACLs',
+          storage: 'Storage Control — USB & Partition Lockdown',
+          elevation: 'Elevation Control — Just-In-Time Privilege Management',
+          dac: 'DAC — Defense Against Configurations',
+          audit: 'Unified Audit & EDR Telemetry Log',
+          agents: 'Multi-OS Endpoint Agents (Linux & Windows)',
+          cyberhero: 'Cyber Hero® AI Security Advisor'
+        },
+        kpiLblEndpoints: 'Protected Endpoints (Lin/Win)',
+        kpiLblApps: 'SHA-256 Catalog (Learning Mode)',
+        kpiLblRf: 'Active Ringfencing™ Policies',
+        kpiRfSub: 'Process & network containment',
+        kpiLblDac: 'DAC Compliance Score',
+        kpiLblRoi: 'Attack Surface Reduction (Forrester TEI)',
+        kpiRoiSub: '184% ROI • 7-month Payback • Zero Trust',
+        dashEpTitle: '🖥️ Managed Endpoints (Linux & Windows)',
+        dashEpSubtitle: 'Control operating mode per machine: Learning Mode, Audit Only, Lockdown (Enforce), or EDR Isolation',
+        thEpHost: 'Hostname',
+        thEpOs: 'Operating System',
+        thEpIp: 'IP / Agent',
+        thEpRes: 'CPU / RAM',
+        thEpMode: 'Zero Trust Mode',
+        thEpActions: 'Quick Actions',
+        dashStreamTitle: '📡 Real-Time Unified Telemetry (Unified Audit & EDR Stream)',
+        dashStreamSubtitle: 'Recent events across Application Allowlisting, Ringfencing™, AI Control, Storage, and Elevation',
+        thLogTime: 'Timestamp',
+        thLogHost: 'Host',
+        thLogMod: 'Module',
+        thLogAct: 'Action',
+        thLogProc: 'Process / Binary',
+        thLogDet: 'Policy / Details',
+        allowTitle: '📦 Application Allowlisting & Learning Mode Catalog',
+        allowSubtitle: 'Deny-by-default, allow-by-exception. Every executable on the server is cataloged with its full cryptographic SHA-256 hash.',
+        appSearchPlaceholder: 'Search binary, path, or SHA-256 hash...',
+        optAppAll: 'All Statuses',
+        optAppAllowed: 'Allowed',
+        optAppRingfenced: 'Ringfenced™ (Restricted)',
+        optAppPending: 'Pending Review',
+        optAppBlocked: 'Blocked',
+        thAppName: 'Application',
+        thAppPath: 'Executable Path',
+        thAppSha: 'Full SHA-256',
+        thAppCat: 'Category / OS',
+        thAppStatus: 'Status',
+        thAppDecision: '1-Click Decision',
+        rfTitle: '🛡️ ThreatLocker Ringfencing™',
+        rfSubtitle: 'Restrict what approved applications can do after launch: block child shell spawning, sensitive file access, and outbound connections.',
+        aiTitle: '🤖 ThreatLocker Zero Trust AI Control',
+        aiSubtitle: 'Put AI agents to work without losing control. Govern execution, folder access, network, and token binding for Ollama, Hermes Agent, and MCPs.',
+        netTitle: '🌐 Network Control (Host Firewall & ZTNA Dynamic ACLs)',
+        netSubtitle: 'Make network resources invisible to unauthorized traffic and block lateral movement (SMB/RPC/Reverse Shells).',
+        thNetRule: 'Rule',
+        thNetDir: 'Direction / Proto',
+        thNetPort: 'Port(s)',
+        thNetCidr: 'Source CIDR',
+        thNetAct: 'Zero Trust Action',
+        thNetMode: 'Mode',
+        thNetDesc: 'Description',
+        stTitle: '💾 Storage Control (USB Mass Storage, Partitions & Vaults)',
+        stSubtitle: 'Granular visibility and lockdown over external USB drives, EFI partition (/boot/efi), and SSH keys against exfiltration.',
+        thStPol: 'Policy',
+        thStType: 'Media Type',
+        thStPath: 'Path / Device',
+        thStPerm: 'Permission',
+        thStProc: 'Authorized Processes',
+        thStMode: 'Mode',
+        thStAct: 'Change Permission',
+        elevTitle: '🔑 Elevation Control (Just-In-Time Privileged Access Management)',
+        elevSubtitle: 'Remove standing admin/root privileges and approve temporary per-binary elevations with full audit trails.',
+        btnElevReq: '+ Request JIT Elevation',
+        thElUser: 'User / Host',
+        thElCmd: 'Requested Command / Binary',
+        thElJust: 'Justification',
+        thElDur: 'Duration',
+        thElStatus: 'Status',
+        thElAct: 'Cyber Hero Action',
+        dacTitle: '⚙️ DAC — Defense Against Configurations',
+        dacSubtitle: 'Continuous Configuration Drift monitoring, CIS Benchmark, UEFI dbx Firmware, and Linux/Windows Hardening.',
+        thDacId: 'Benchmark ID',
+        thDacCtrl: 'Security Control',
+        thDacCat: 'Category',
+        thDacCur: 'Observed Current State',
+        thDacExp: 'Expected Baseline',
+        thDacStatus: 'Status',
+        auditTitle: '📜 Unified Audit & EDR Telemetry Log',
+        auditSubtitle: 'Complete forensic history of executions, simulated blocks (Audit Mode), Ringfencing™ violations, and storage events.',
+        auditSearchPlaceholder: 'Filter process, command, or policy...',
+        optAudAll: 'All Modules',
+        optAudApp: 'Application Control',
+        optAudRf: 'Ringfencing™',
+        optAudAi: 'AI Control',
+        optAudSt: 'Storage Control',
+        optAudEl: 'Elevation Control',
+        optAudEdr: 'EDR',
+        thAudTime: 'Timestamp',
+        thAudHost: 'Host',
+        thAudMod: 'Module',
+        thAudSev: 'Severity',
+        thAudAct: 'Action Taken',
+        thAudProc: 'Process & Command Line',
+        thAudDet: 'Details',
+        agLinTitle: '🐧 Installable Linux Agent (Ubuntu / Debian / RHEL / Kali)',
+        agLinDesc: 'Collects real-time SHA-256 inventory directly from /proc, monitors AI agents (Ollama/Hermes/REA), checks DAC drift, and syncs policies every 30s.',
+        agLinCode: 'curl -sL http://YOUR_SERVER:9443/api/agents/download/linux -o tl_agent_linux.py\npython3 tl_agent_linux.py --once',
+        agLinBtn: '⬇ Download Linux Agent (tl_agent_linux.py)',
+        agWinTitle: '🪟 Installable Windows 10/11 & Windows Server Agent',
+        agWinDesc: 'Available in native PowerShell (.ps1 with Authenticode + SHA-256 + Windows Defender DAC) and cross-platform Python (.py).',
+        agWinCode: 'Invoke-WebRequest -Uri "http://YOUR_SERVER:9443/api/agents/download/windows-ps1" -OutFile ThreatLockerAgent.ps1\npowershell -ExecutionPolicy Bypass -File .\\ThreatLockerAgent.ps1 -ServerUrl "http://YOUR_SERVER:9443"',
+        agWinBtnPs1: '⬇ Download Windows Agent (.ps1)',
+        agWinBtnPy: '⬇ Download Windows Agent (.py)',
+        chTitle: '🦸 Cyber Hero® AI Advisor (60-Second Response)',
+        chSubtitle: 'Expert support in under 60 seconds: ask for Ringfencing™ policy recommendations, incident analysis, or compliance review.',
+        chDefaultInput: 'Analyze recent Zero Trust audit events and recommend Ringfencing and Hardening rules for this server.',
+        btnAskCh: 'Ask Cyber Hero® AI',
+        chDefaultOutput: 'Click "Ask Cyber Hero® AI" to analyze real-time server telemetry...',
+        chLoading: '⏳ Consulting Cyber Hero® AI Advisor...',
+        chModelPrefix: 'Model',
+        copyHashBtn: '📋 Copy SHA-256',
+        copiedHashBtn: '✓ Copied!',
+        toastHashCopied: 'Full SHA-256 hash copied to clipboard!',
+        btnAllow: 'Allow',
+        btnRingfence: 'Ringfence',
+        btnBlock: 'Block',
+        btnLearningMode: 'Learning',
+        btnAuditMode: 'Audit',
+        btnLockdownMode: 'Lockdown',
+        btnIsolateHost: 'Isolate Host',
+        btnReintegrateHost: 'Reintegrate Host',
+        btnSimAuditMode: 'Audit Mode (Simulation)',
+        btnEnforceMode: 'Enforce Mode',
+        btnEnforceZt: 'Enforce Zero Trust',
+        btnBlockAgent: 'Block Agent',
+        btnReadOnly: 'Read-Only',
+        btnApproveJit: 'Approve JIT',
+        btnDeny: 'Deny',
+        lblReviewedBy: 'Reviewed by',
+        lblTargets: 'Targets',
+        lblBlockedSubprocs: 'Blocked Child Processes',
+        lblProtectedFiles: 'Protected Files',
+        lblAllowedNetwork: 'Allowed Network / Domains',
+        lblInternetBlocked: 'INTERNET BLOCKED',
+        lblRecordedInterceptions: 'Recorded interceptions',
+        lblProcesses: 'Processes',
+        lblAuthorizedWorkspaces: 'Authorized Workspaces',
+        lblDeniedPaths: 'Denied Paths (Credential Guard)',
+        lblShellExec: 'Shell Execution',
+        lblAllowedAudited: 'Allowed (Audited)',
+        lblBlockedFem: 'Blocked',
+        lblHwTokenBound: 'Hardware Token Bound',
+        lblActive: 'Active',
+        lblRemediation: 'Remediation',
+        lblMinutes: 'min',
+        promptJitCmd: 'Privileged command to request JIT elevation:',
+        defaultJitJustification: 'Authorized packet diagnostics via ThreatLocker Zero Trust portal',
+        toastEndpointUpdated: 'Endpoint mode updated to',
+        toastAppUpdated: 'Application policy updated to',
+        toastRfUpdated: 'Ringfencing policy updated to',
+        toastAiUpdated: 'AI Control policy updated to',
+        toastStorageUpdated: 'Storage policy updated to',
+        toastElevationUpdated: 'Elevation request updated:',
+        toastElevationCreated: 'JIT elevation request created!',
+        toastSimIntercepted: '🛡️ Intercepted in Simulation Mode:',
+        toastSynced: 'Zero Trust telemetry synchronized!'
+      }
+    };
+
+    // Bilingual dictionary for dynamic backend strings (categories, policies, statuses, audit log details)
+    const DYNAMIC_PT = {
+      // Statuses & Modes
+      'ALLOWED': 'PERMITIDO',
+      'RINGFENCED': 'CERCADO (RINGFENCED)',
+      'PENDING': 'PENDENTE',
+      'BLOCKED': 'BLOQUEADO',
+      'LEARNING': 'APRENDIZADO',
+      'AUDIT': 'AUDITORIA',
+      'LOCKDOWN': 'BLOQUEIO TOTAL',
+      'ISOLATED (QUARANTINE)': 'ISOLADO (QUARENTENA)',
+      'ENFORCE': 'BLOQUEIO ATIVO',
+      'ENFORCE MODE': 'MODO BLOQUEIO',
+      'AUDIT MODE': 'MODO AUDITORIA',
+      'BLOCK': 'BLOQUEAR',
+      'ALLOW': 'PERMITIR',
+      'ZTNA_AUTH_REQUIRED': 'AUTENTICAÇÃO ZTNA EXIGIDA',
+      'INBOUND': 'ENTRADA',
+      'OUTBOUND': 'SAÍDA',
+      'READ_ONLY': 'SOMENTE LEITURA',
+      'APPROVED': 'APROVADO',
+      'DENIED': 'NEGADO',
+      'COMPLIANT': 'CONFORME',
+      'WARNING': 'ALERTA',
+      'DRIFT_DETECTED': 'DERIVA DETECTADA',
+      'CRITICAL': 'CRÍTICO',
+      'HIGH': 'ALTO',
+      'MEDIUM': 'MÉDIO',
+      'INFO': 'INFO',
+      // Modules
+      'Application Control': 'Controle de Aplicações',
+      'Ringfencing': 'Cercamento Digital (Ringfencing™)',
+      'AI Control': 'Controle de IA',
+      'Storage Control': 'Controle de Armazenamento',
+      'Elevation Control': 'Controle de Elevação',
+      'Network Control': 'Controle de Rede',
+      'EDR': 'EDR',
+      // App Categories & Publishers
+      'Script Interpreter': 'Interpretador de Scripts',
+      'Web Browser': 'Navegador Web',
+      'Windows System Binary': 'Binário de Sistema Windows',
+      'Systemd Core Service': 'Serviço Central Systemd',
+      'System Binary': 'Binário do Sistema',
+      'AI Agent / LLM Runtime': 'Agente de IA / Runtime LLM',
+      'Security & Network Daemon': 'Daemon de Rede e Segurança',
+      'Container Runtime': 'Runtime de Container',
+      'Unverified Executable (Suspected Ransomware)': 'Executável Não Verificado (Suspeita de Ransomware)',
+      'GNU / Open Source': 'GNU / Código Aberto',
+      'AI Verified Runtime': 'Runtime de IA Verificado',
+      'Unknown / Unsigned': 'Desconhecido / Não Assinado',
+      // Ringfencing policy names
+      'Ringfence Web Browsers & Headless Chromium': 'Cercamento de Navegadores Web & Chromium Headless',
+      'Ringfence Office & PDF Readers (Anti-Macro/LOTL)': 'Cercamento de Suítes Office & Leitores PDF (Anti-Macro/LOTL)',
+      'Ringfence Script Interpreters (Python / Node / PowerShell)': 'Cercamento de Interpretadores de Script (Python / Node / PowerShell)',
+      'Ringfence Kali Sandbox & Docker Runtime': 'Cercamento do Kali Sandbox & Runtime Docker',
+      // AI Control policy names
+      'Ollama Local LLM Engine (llama-server / qwen3-hermes)': 'Motor LLM Local Ollama (llama-server / qwen3-hermes)',
+      'Hermes Agent Gateway & Pentest Automation': 'Gateway Hermes Agent & Automação de Pentest',
+      'REA Reverse Engineering MCP Server': 'Servidor MCP de Engenharia Reversa REA',
+      'Unverified External AI Agents (AutoGPT / Rogue MCPs)': 'Agentes de IA Externos Não Verificados (AutoGPT / MCPs Não Autorizados)',
+      // Network policy names & descriptions
+      'SSH Administrative Access (Fail2Ban Protected)': 'Acesso Administrativo SSH (Protegido por Fail2Ban)',
+      'Allow OpenSSH Server with brute-force protection': 'Permitir Servidor OpenSSH com proteção contra força bruta',
+      'Ollama LLM API Port Lockdown': 'Bloqueio de Porta da API LLM Ollama',
+      'Restrict external internet access to port 11434': 'Restringir acesso externo da internet à porta 11434',
+      'ThreatLocker Zero Trust Control Plane': 'Plano de Controle Zero Trust ThreatLocker',
+      'Zero Trust Portal & Agent Telemetry API': 'Portal Zero Trust & API de Telemetria dos Agentes',
+      'Block Lateral Movement SMB/RPC (445/135/139)': 'Bloquear Movimentação Lateral SMB/RPC (445/135/139)',
+      'Prevent Worm/Ransomware SMB lateral movement': 'Prevenir movimentação lateral SMB de Worms/Ransomware',
+      'Block Known Reverse Shell Ports (4444/1337/9001)': 'Bloquear Portas Conhecidas de Reverse Shell (4444/1337/9001)',
+      'Outbound C2 & Metasploit/Netcat default listener ports': 'Portas padrão de escuta C2 de saída e Metasploit/Netcat',
+      // Storage policies
+      'Block Unencrypted USB Mass Storage': 'Bloquear Armazenamento USB Não Criptografado',
+      'USB Mass Storage': 'Armazenamento em Massa USB',
+      'Protect Boot & EFI Partition Integrity': 'Proteger Integridade da Partição de Boot & EFI',
+      'System Partition': 'Partição do Sistema',
+      'SSH & GPG Cryptographic Key Vault': 'Cofre de Chaves Criptográficas SSH & GPG',
+      'Credential Vault': 'Cofre de Credenciais',
+      'Database & Backup Exfiltration Guard': 'Proteção Contra Exfiltração de Banco de Dados & Backups',
+      'Data Repository': 'Repositório de Dados',
+      // DAC titles & categories
+      'Windows Defender Real-Time & Tamper Protection': 'Proteção em Tempo Real e Contra Violação do Windows Defender',
+      'Windows Endpoint Hardening': 'Hardening de Endpoint Windows',
+      'SMBv1 Legacy Protocol Disabled (Anti-WannaCry/Lateral Movement)': 'Protocolo Legado SMBv1 Desativado (Anti-WannaCry/Movimentação Lateral)',
+      'Windows Network Hardening': 'Hardening de Rede Windows',
+      'Local LLM API (Ollama :11434) Loopback Binding': 'Vinculação Loopback da API LLM Local (Ollama :11434)',
+      'AI Control & ZTNA': 'Controle de IA & ZTNA',
+      'Listening on *:11434 (All Interfaces)': 'Escutando em *:11434 (Todas as Interfaces)',
+      'Bound to 127.0.0.1:11434 or protected by ThreatLocker ZTNA ACL': 'Vinculado a 127.0.0.1:11434 ou protegido por ACL ZTNA ThreatLocker',
+      'Kernel Address Space Layout Randomization (ASLR)': 'Randomização do Espaço de Endereçamento do Kernel (ASLR)',
+      'Kernel Hardening': 'Hardening do Kernel',
+      'UEFI Secure Boot Forbidden Signature Database (dbx)': 'Banco de Assinaturas Proibidas do UEFI Secure Boot (dbx)',
+      'Firmware Security': 'Segurança de Firmware',
+      'Version 20260707 (Updated via fwupdmgr)': 'Versão 20260707 (Atualizada via fwupdmgr)',
+      'Version >= 20260707': 'Versão >= 20260707',
+      'Fail2Ban Brute-Force Protection Service': 'Serviço de Proteção Contra Força Bruta Fail2Ban',
+      'Network Defense': 'Defesa de Rede',
+      'UFW Host Firewall Active Enforcement (Ports 22, 9443, 11434)': 'Aplicação Ativa do Firewall de Host UFW (Portas 22, 9443, 11434)',
+      'Network Control & ZTNA': 'Controle de Rede & ZTNA',
+      'UFW Active (Default Deny Incoming)': 'UFW Ativo (Negar Entrada por Padrão)',
+      'UFW Active with explicit allowlist rules': 'UFW Ativo com regras explícitas de permissão',
+      'Ubuntu Pro ESM Security Maintenance (Apps & Infra)': 'Manutenção de Segurança Ubuntu Pro ESM (Apps & Infra)',
+      'Patch Management': 'Gestão de Patches',
+      'esm-infra & esm-apps enabled (Valid until 2036)': 'esm-infra & esm-apps ativos (Válido até 2036)',
+      'Active Ubuntu Pro Subscription': 'Assinatura Ubuntu Pro Ativa',
+      'Kali Pentest Sandbox Resource & Bridge Isolation': 'Isolamento de Recursos e Bridge do Kali Pentest Sandbox',
+      'Container Ringfencing': 'Cercamento de Containers',
+      'Running (CPU limit: 2.0, Mem limit: 4096MB, Bridge mode)': 'Em execução (Limite CPU: 2.0, Limite Mem: 4096MB, Modo Bridge)',
+      'Container confined with CPU/Memory limits & non-host network': 'Container confinado com limites de CPU/Memória e rede isolada do host',
+      // Audit Actions
+      'Allowed (Ringfenced AI)': 'Permitido (IA Cercada)',
+      'Blocked (Enforced)': 'Bloqueado (Aplicado)',
+      'Elevation APPROVED': 'Elevação APROVADA',
+      'Elevation DENIED': 'Elevação NEGADA',
+      'Host Isolated (Quarantine)': 'Host Isolado (Quarentena)',
+      'Mode Changed -> AUDIT': 'Modo Alterado -> AUDITORIA',
+      'Mode Changed -> LEARNING': 'Modo Alterado -> APRENDIZADO',
+      'Mode Changed -> LOCKDOWN': 'Modo Alterado -> BLOQUEIO TOTAL'
+    };
+
+    const DYNAMIC_EN = {
+      'Atualização de pacotes de segurança e kernel Ubuntu Pro': 'Ubuntu Pro security and kernel package update',
+      'Diagnóstico autorizado de pacotes via painel ThreatLocker Zero Trust': 'Authorized packet diagnostics via ThreatLocker Zero Trust portal',
+      'Solicitação de elevação temporária de privilégio': 'Temporary privilege elevation request'
+    };
+
+    function t(key) {
+      return (I18N[currentLang] && I18N[currentLang][key]) || I18N['pt-BR'][key] || key;
+    }
+
+    function trDynamic(str) {
+      if (str === null || str === undefined) return '';
+      const s = String(str);
+      if (currentLang === 'pt-BR') {
+        if (DYNAMIC_PT[s]) return DYNAMIC_PT[s];
+        // Pattern translations for dynamic audit details in PT-BR
+        let out = s;
+        out = out.replace(/^AI process '([^']+)' verified by SHA-256 \(([^)]+)\) and operating within allowed boundaries\.$/, "Processo de IA '$1' verificado por SHA-256 ($2) e operando dentro dos limites permitidos.");
+        out = out.replace(/^\[ZERO-DAY INTERCEPTED\] Binary ([^\s]+) is not in the approved SHA-256 Allowlist\. Execution denied before first instruction\.$/, "[ZERO-DAY INTERCEPTADO] O binário $1 não consta na Lista de Permissões SHA-256 aprovada. Execução negada antes da primeira instrução.");
+        out = out.replace(/^\[AI AGENT CONTAINED\] AI Agent attempted prompt-injection file read outside allowed workspace \(([^)]+)\)\. Blocked by AI Control Ringfence\.$/, "[AGENTE DE IA CONTIDO] Agente de IA tentou leitura de arquivo por prompt-injection fora do diretório permitido ($1). Bloqueado pelo Cercamento de Controle de IA.");
+        out = out.replace(/^\[RINGFENCE VIOLATION\] Trusted binary ([^\s]+) attempted to spawn restricted child shell \(([^)]+)\) and connect to untrusted IP ([^\s]+)\.$/, "[VIOLAÇÃO DE RINGFENCE] O binário confiável $1 tentou criar um sub-shell restrito ($2) e conectar ao IP não confiável $3.");
+        out = out.replace(/^\[PRODUCTION ENFORCEMENT\] Process PID (\d+) \(([^)]+)\) matched blocked SHA-256 \(([^)]+)\) and was terminated \(SIGKILL\)\.$/, "[BLOQUEIO EM PRODUÇÃO] O processo PID $1 ($2) correspondeu ao SHA-256 bloqueado ($3) e foi encerrado imediatamente (SIGKILL).");
+        out = out.replace(/^Status of ([^\s]+) \(([^)]+)\) changed to ([A-Z]+)$/, "Status de $1 ($2) alterado para $3");
+        out = out.replace(/^Policy Updated -> ([A-Z]+)$/, "Política Atualizada -> $1");
+        out = out.replace(/^Endpoint ([^\s]+) transitioned to mode=([A-Z]+) \(isolated=(True|False)\)$/, "Endpoint $1 alterado para modo=$2 (isolado=$3)");
+        out = out.replace(/^Elevation for '([^']+)' was ([A-Z]+) \((\d+)m\)$/, "Elevação para '$1' foi $2 ($3m)");
+        return out;
+      } else {
+        if (DYNAMIC_EN[s]) return DYNAMIC_EN[s];
+        return s;
+      }
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang === 'en-US' ? 'en-US' : 'pt-BR';
+      localStorage.setItem('tl_lang', currentLang);
+      document.documentElement.lang = currentLang;
+
+      document.getElementById('btn-lang-pt').classList.toggle('active', currentLang === 'pt-BR');
+      document.getElementById('btn-lang-en').classList.toggle('active', currentLang === 'en-US');
+
+      const mapIds = {
+        'brand-subtitle': 'brandSubtitle',
+        'nav-sec-cmd': 'navSecCmd',
+        'nav-sec-infra': 'navSecInfra',
+        'nav-sec-secops': 'navSecSecops',
+        'nav-lbl-dashboard': 'navDashboard',
+        'nav-lbl-allowlisting': 'navAllowlisting',
+        'nav-lbl-ringfencing': 'navRingfencing',
+        'nav-lbl-aicontrol': 'navAicontrol',
+        'nav-lbl-network': 'navNetwork',
+        'nav-lbl-storage': 'navStorage',
+        'nav-lbl-elevation': 'navElevation',
+        'nav-lbl-dac': 'navDac',
+        'nav-lbl-audit': 'navAudit',
+        'nav-lbl-agents': 'navAgents',
+        'nav-lbl-cyberhero': 'navCyberhero',
+        'global-mode-pill': 'globalModePill',
+        'global-mode-sub': 'globalModeSub',
+        'btn-sim-zeroday': 'btnSimZeroday',
+        'btn-sim-ringfence': 'btnSimRingfence',
+        'btn-sim-ai': 'btnSimAi',
+        'btn-sync-now': 'btnSyncNow',
+        'kpi-lbl-endpoints': 'kpiLblEndpoints',
+        'kpi-lbl-apps': 'kpiLblApps',
+        'kpi-lbl-rf': 'kpiLblRf',
+        'kpi-rf-sub': 'kpiRfSub',
+        'kpi-lbl-dac': 'kpiLblDac',
+        'kpi-lbl-roi': 'kpiLblRoi',
+        'kpi-roi-sub': 'kpiRoiSub',
+        'dash-ep-title': 'dashEpTitle',
+        'dash-ep-subtitle': 'dashEpSubtitle',
+        'th-ep-host': 'thEpHost',
+        'th-ep-os': 'thEpOs',
+        'th-ep-ip': 'thEpIp',
+        'th-ep-res': 'thEpRes',
+        'th-ep-mode': 'thEpMode',
+        'th-ep-actions': 'thEpActions',
+        'dash-stream-title': 'dashStreamTitle',
+        'dash-stream-subtitle': 'dashStreamSubtitle',
+        'th-log-time': 'thLogTime',
+        'th-log-host': 'thLogHost',
+        'th-log-mod': 'thLogMod',
+        'th-log-act': 'thLogAct',
+        'th-log-proc': 'thLogProc',
+        'th-log-det': 'thLogDet',
+        'allow-title': 'allowTitle',
+        'allow-subtitle': 'allowSubtitle',
+        'opt-app-all': 'optAppAll',
+        'opt-app-allowed': 'optAppAllowed',
+        'opt-app-ringfenced': 'optAppRingfenced',
+        'opt-app-pending': 'optAppPending',
+        'opt-app-blocked': 'optAppBlocked',
+        'th-app-name': 'thAppName',
+        'th-app-path': 'thAppPath',
+        'th-app-sha': 'thAppSha',
+        'th-app-cat': 'thAppCat',
+        'th-app-status': 'thAppStatus',
+        'th-app-decision': 'thAppDecision',
+        'rf-title': 'rfTitle',
+        'rf-subtitle': 'rfSubtitle',
+        'ai-title': 'aiTitle',
+        'ai-subtitle': 'aiSubtitle',
+        'net-title': 'netTitle',
+        'net-subtitle': 'netSubtitle',
+        'th-net-rule': 'thNetRule',
+        'th-net-dir': 'thNetDir',
+        'th-net-port': 'thNetPort',
+        'th-net-cidr': 'thNetCidr',
+        'th-net-act': 'thNetAct',
+        'th-net-mode': 'thNetMode',
+        'th-net-desc': 'thNetDesc',
+        'st-title': 'stTitle',
+        'st-subtitle': 'stSubtitle',
+        'th-st-pol': 'thStPol',
+        'th-st-type': 'thStType',
+        'th-st-path': 'thStPath',
+        'th-st-perm': 'thStPerm',
+        'th-st-proc': 'thStProc',
+        'th-st-mode': 'thStMode',
+        'th-st-act': 'thStAct',
+        'elev-title': 'elevTitle',
+        'elev-subtitle': 'elevSubtitle',
+        'btn-elev-req': 'btnElevReq',
+        'th-el-user': 'thElUser',
+        'th-el-cmd': 'thElCmd',
+        'th-el-just': 'thElJust',
+        'th-el-dur': 'thElDur',
+        'th-el-status': 'thElStatus',
+        'th-el-act': 'thElAct',
+        'dac-title': 'dacTitle',
+        'dac-subtitle': 'dacSubtitle',
+        'th-dac-id': 'thDacId',
+        'th-dac-ctrl': 'thDacCtrl',
+        'th-dac-cat': 'thDacCat',
+        'th-dac-cur': 'thDacCur',
+        'th-dac-exp': 'thDacExp',
+        'th-dac-status': 'thDacStatus',
+        'audit-title': 'auditTitle',
+        'audit-subtitle': 'auditSubtitle',
+        'opt-aud-all': 'optAudAll',
+        'opt-aud-app': 'optAudApp',
+        'opt-aud-rf': 'optAudRf',
+        'opt-aud-ai': 'optAudAi',
+        'opt-aud-st': 'optAudSt',
+        'opt-aud-el': 'optAudEl',
+        'opt-aud-edr': 'optAudEdr',
+        'th-aud-time': 'thAudTime',
+        'th-aud-host': 'thAudHost',
+        'th-aud-mod': 'thAudMod',
+        'th-aud-sev': 'thAudSev',
+        'th-aud-act': 'thAudAct',
+        'th-aud-proc': 'thAudProc',
+        'th-aud-det': 'thAudDet',
+        'ag-lin-title': 'agLinTitle',
+        'ag-lin-desc': 'agLinDesc',
+        'ag-lin-code': 'agLinCode',
+        'ag-lin-btn': 'agLinBtn',
+        'ag-win-title': 'agWinTitle',
+        'ag-win-desc': 'agWinDesc',
+        'ag-win-code': 'agWinCode',
+        'ag-win-btn-ps1': 'agWinBtnPs1',
+        'ag-win-btn-py': 'agWinBtnPy',
+        'ch-title': 'chTitle',
+        'ch-subtitle': 'chSubtitle',
+        'btn-ask-ch': 'btnAskCh'
+      };
+
+      for (const [elId, tKey] of Object.entries(mapIds)) {
+        const el = document.getElementById(elId);
+        if (el) el.textContent = t(tKey);
+      }
+
+      document.getElementById('app-search').placeholder = t('appSearchPlaceholder');
+      document.getElementById('audit-search').placeholder = t('auditSearchPlaceholder');
+
+      const chIn = document.getElementById('cyberhero-input');
+      if (chIn && (chIn.value === I18N['pt-BR'].chDefaultInput || chIn.value === I18N['en-US'].chDefaultInput)) {
+        chIn.value = t('chDefaultInput');
+      }
+      const chOut = document.getElementById('cyberhero-output');
+      if (chOut && (chOut.textContent === I18N['pt-BR'].chDefaultOutput || chOut.textContent === I18N['en-US'].chDefaultOutput)) {
+        chOut.textContent = t('chDefaultOutput');
+      }
+
+      const titles = I18N[currentLang].tabTitles;
+      document.getElementById('current-tab-title').textContent = titles[currentTabId] || titles.dashboard;
+
+      loadOverview();
+      if (currentTabId === 'allowlisting') loadApplications();
+      if (currentTabId === 'ringfencing') loadRingfencing();
+      if (currentTabId === 'aicontrol') loadAIControl();
+      if (currentTabId === 'network') loadNetwork();
+      if (currentTabId === 'storage') loadStorage();
+      if (currentTabId === 'elevation') loadElevation();
+      if (currentTabId === 'dac') loadDAC();
+      if (currentTabId === 'audit') loadAuditLogs();
+    }
+
+    function showToast(msg) {
+      const tEl = document.getElementById('toast');
+      tEl.textContent = msg;
+      tEl.style.display = 'block';
+      setTimeout(() => { tEl.style.display = 'none'; }, 3600);
+    }
+
+    async function copySha256(hash, btnEl) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(hash);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = hash;
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        if (btnEl) {
+          const orig = btnEl.textContent;
+          btnEl.textContent = t('copiedHashBtn');
+          btnEl.classList.add('copied');
+          setTimeout(() => {
+            btnEl.textContent = t('copyHashBtn');
+            btnEl.classList.remove('copied');
+          }, 2000);
+        }
+        showToast(t('toastHashCopied'));
+      } catch (e) {
+        showToast(hash);
+      }
+    }
+
+    function switchTab(tabId, el) {
+      currentTabId = tabId;
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      if (el) el.classList.add('active');
+      document.querySelector('.sidebar').classList.remove('open');
+
+      const titles = I18N[currentLang].tabTitles;
+      document.getElementById('current-tab-title').textContent = titles[tabId] || titles.dashboard;
+
+      if (tabId === 'allowlisting') loadApplications();
+      if (tabId === 'ringfencing') loadRingfencing();
+      if (tabId === 'aicontrol') loadAIControl();
+      if (tabId === 'network') loadNetwork();
+      if (tabId === 'storage') loadStorage();
+      if (tabId === 'elevation') loadElevation();
+      if (tabId === 'dac') loadDAC();
+      if (tabId === 'audit') loadAuditLogs();
+    }
+
+    async function loadOverview() {
+      const res = await fetch('/api/overview');
+      const data = await res.json();
+      lastOverviewData = data;
+      const m = data.metrics;
+
+      document.getElementById('kpi-endpoints').textContent = m.total_endpoints;
+      if (currentLang === 'en-US') {
+        document.getElementById('kpi-endpoints-sub').textContent = `${m.online_endpoints} Online • ${m.isolated_endpoints} Isolated`;
+        document.getElementById('kpi-apps-sub').textContent = `${m.allowed_applications} Allowed • ${m.ringfenced_applications} Ringfenced • ${m.pending_applications} Pending`;
+        document.getElementById('kpi-dac-sub').textContent = `${m.dac_drift_count} configuration drift alert(s)`;
+      } else {
+        document.getElementById('kpi-endpoints-sub').textContent = `${m.online_endpoints} Online • ${m.isolated_endpoints} Isolados`;
+        document.getElementById('kpi-apps-sub').textContent = `${m.allowed_applications} Permitidos • ${m.ringfenced_applications} Cercados • ${m.pending_applications} Pendentes`;
+        document.getElementById('kpi-dac-sub').textContent = `${m.dac_drift_count} alerta(s) de deriva de configuração`;
+      }
+      document.getElementById('kpi-apps').textContent = m.total_applications;
+      document.getElementById('kpi-rf').textContent = m.ringfencing_policies;
+      document.getElementById('kpi-dac').textContent = m.dac_compliance_pct + '%';
+
+      document.getElementById('nav-ep-count').textContent = m.total_endpoints;
+      document.getElementById('nav-app-count').textContent = m.total_applications;
+      document.getElementById('nav-rf-count').textContent = m.ringfencing_policies;
+      document.getElementById('nav-ai-count').textContent = m.ai_control_policies;
+      document.getElementById('nav-net-count').textContent = m.network_policies;
+      document.getElementById('nav-st-count').textContent = m.storage_policies;
+      document.getElementById('nav-elev-count').textContent = m.pending_elevations;
+      document.getElementById('nav-dac-pct').textContent = m.dac_compliance_pct + '%';
+
+      const epTbody = document.getElementById('endpoints-tbody');
+      epTbody.innerHTML = data.endpoints.map(ep => {
+        const modeRaw = ep.isolated ? 'ISOLATED (QUARANTINE)' : ep.mode.toUpperCase();
+        return `
+        <tr>
+          <td><strong>${ep.hostname}</strong><br><span class="mono">${ep.id}</span></td>
+          <td>${ep.os_type.toUpperCase()} — ${ep.os_version}</td>
+          <td><span class="mono">${ep.ip_address}</span><br><small style="color:var(--text-muted)">${ep.agent_version}</small></td>
+          <td>CPU: ${ep.cpu_percent}% | RAM: ${ep.mem_percent}%</td>
+          <td>
+            <span class="badge ${ep.isolated ? 'badge-critical' : 'badge-ringfenced'}">
+              ${trDynamic(modeRaw)}
+            </span>
+          </td>
+          <td>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="btn" onclick="setEndpointMode('${ep.id}', 'learning')">${t('btnLearningMode')}</button>
+              <button class="btn" onclick="setEndpointMode('${ep.id}', 'audit')">${t('btnAuditMode')}</button>
+              <button class="btn btn-primary" onclick="setEndpointMode('${ep.id}', 'lockdown')">${t('btnLockdownMode')}</button>
+              <button class="btn ${ep.isolated ? 'btn-success' : 'btn-danger'}" onclick="setEndpointMode('${ep.id}', '${ep.isolated ? 'learning' : 'isolated'}')">
+                ${ep.isolated ? t('btnReintegrateHost') : t('btnIsolateHost')}
+              </button>
+            </div>
+          </td>
+        </tr>
+      `}).join('');
+
+      const logsTbody = document.getElementById('recent-logs-tbody');
+      logsTbody.innerHTML = data.recent_logs.slice(0, 12).map(l => `
+        <tr>
+          <td class="mono">${l.timestamp.replace('T', ' ').slice(0, 19)}</td>
+          <td><strong>${l.hostname || ''}</strong></td>
+          <td><span class="badge badge-ringfenced">${trDynamic(l.module)}</span></td>
+          <td><span class="badge ${l.severity === 'critical' || l.severity === 'high' ? 'badge-blocked' : 'badge-allowed'}">${trDynamic(l.action_taken)}</span></td>
+          <td><strong>${l.process_name || ''}</strong><br><span class="mono">${(l.cmdline || '').slice(0, 68)}</span></td>
+          <td style="max-width:360px; color:#cbd5e1;">${trDynamic(l.details || '')}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function setEndpointMode(id, mode) {
+      await fetch('/api/endpoints/mode', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id, mode})
+      });
+      showToast(`${t('toastEndpointUpdated')} ${trDynamic(mode.toUpperCase())}`);
+      loadOverview();
+    }
+
+    async function loadApplications() {
+      const q = document.getElementById('app-search').value;
+      const status = document.getElementById('app-status-filter').value;
+      const res = await fetch(`/api/applications?status=${encodeURIComponent(status)}&q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      const tbody = document.getElementById('apps-tbody');
+      tbody.innerHTML = data.applications.map(a => `
+        <tr>
+          <td><strong>${a.name}</strong><br><small style="color:var(--text-muted)">${trDynamic(a.publisher)}</small></td>
+          <td class="mono">${a.exe_path}</td>
+          <td>
+            <div class="sha256-cell">
+              <code class="sha256-full" title="${a.sha256}">${a.sha256}</code>
+              <button type="button" class="btn-copy-hash" onclick="copySha256('${a.sha256}', this)">${t('copyHashBtn')}</button>
+            </div>
+          </td>
+          <td>${trDynamic(a.category)}<br><small style="color:var(--light-sky)">${a.os_type.toUpperCase()}</small></td>
+          <td><span class="badge badge-${a.status}">${trDynamic(a.status.toUpperCase())}</span></td>
+          <td>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="btn btn-success" onclick="updateAppStatus('${a.id}', 'allowed')">${t('btnAllow')}</button>
+              <button class="btn" onclick="updateAppStatus('${a.id}', 'ringfenced')">${t('btnRingfence')}</button>
+              <button class="btn btn-danger" onclick="updateAppStatus('${a.id}', 'blocked')">${t('btnBlock')}</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function updateAppStatus(id, status) {
+      await fetch('/api/applications/status', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id, status})
+      });
+      showToast(`${t('toastAppUpdated')} ${trDynamic(status.toUpperCase())}`);
+      loadApplications();
+      loadOverview();
+    }
+
+    async function loadRingfencing() {
+      const res = await fetch('/api/ringfencing');
+      const data = await res.json();
+      const grid = document.getElementById('ringfencing-grid');
+      grid.innerHTML = data.policies.map(p => `
+        <div class="policy-card">
+          <div class="policy-card-header">
+            <div>
+              <div style="font-weight:700; font-size:15px;">${trDynamic(p.name)}</div>
+              <div class="mono" style="margin-top:3px;">${t('lblTargets')}: ${p.target_app}</div>
+            </div>
+            <span class="badge badge-${p.enforcement_mode === 'enforce' ? 'blocked' : 'ringfenced'}">
+              ${trDynamic(p.enforcement_mode.toUpperCase() + ' MODE')}
+            </span>
+          </div>
+          <div class="policy-meta">
+            <div><strong>${t('lblBlockedSubprocs')}:</strong> <span class="mono">${p.blocked_child_binaries}</span></div>
+            <div><strong>${t('lblProtectedFiles')}:</strong> <span class="mono">${p.protected_files}</span></div>
+            <div><strong>${t('lblAllowedNetwork')}:</strong> <span class="mono">${p.block_internet ? t('lblInternetBlocked') : p.allowed_outbound_domains}</span></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; flex-wrap:wrap; gap:8px;">
+            <span style="font-size:12px; color:var(--light-sky);">${t('lblRecordedInterceptions')}: <strong>${p.hits}</strong></span>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn" onclick="toggleRingfence('${p.id}', 'audit')">${t('btnSimAuditMode')}</button>
+              <button class="btn btn-primary" onclick="toggleRingfence('${p.id}', 'enforce')">${t('btnEnforceMode')}</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function toggleRingfence(id, enforcement_mode) {
+      await fetch('/api/ringfencing', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({action: 'toggle', id, enforcement_mode})
+      });
+      showToast(`${t('toastRfUpdated')} ${trDynamic(enforcement_mode.toUpperCase())}`);
+      loadRingfencing();
+    }
+
+    async function loadAIControl() {
+      const res = await fetch('/api/ai-control');
+      const data = await res.json();
+      const grid = document.getElementById('aicontrol-grid');
+      grid.innerHTML = data.policies.map(p => `
+        <div class="policy-card">
+          <div class="policy-card-header">
+            <div>
+              <div style="font-weight:700; font-size:15px;">🤖 ${trDynamic(p.agent_name)}</div>
+              <div class="mono" style="margin-top:3px;">${t('lblProcesses')}: ${p.process_pattern} | Endpoint: ${p.model_endpoint}</div>
+            </div>
+            <span class="badge badge-${p.mode === 'block' ? 'blocked' : 'ringfenced'}">${trDynamic(p.mode.toUpperCase())}</span>
+          </div>
+          <div class="policy-meta">
+            <div><strong>${t('lblAuthorizedWorkspaces')}:</strong> <span class="mono">${p.allowed_workspace_paths}</span></div>
+            <div><strong>${t('lblDeniedPaths')}:</strong> <span class="mono">${p.denied_paths}</span></div>
+            <div><strong>${t('lblShellExec')}:</strong> ${p.allow_shell_execution ? t('lblAllowedAudited') : t('lblBlockedFem')} | <strong>${t('lblHwTokenBound')}:</strong> ${t('lblActive')}</div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;">
+            <button class="btn" onclick="updateAIPolicy('${p.id}', 'audit')">${t('btnAuditMode')}</button>
+            <button class="btn btn-primary" onclick="updateAIPolicy('${p.id}', 'enforce')">${t('btnEnforceZt')}</button>
+            <button class="btn btn-danger" onclick="updateAIPolicy('${p.id}', 'block')">${t('btnBlockAgent')}</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function updateAIPolicy(id, mode) {
+      await fetch('/api/ai-control', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id, mode})
+      });
+      showToast(`${t('toastAiUpdated')} ${trDynamic(mode.toUpperCase())}`);
+      loadAIControl();
+    }
+
+    async function loadNetwork() {
+      const res = await fetch('/api/network');
+      const data = await res.json();
+      document.getElementById('network-tbody').innerHTML = data.policies.map(n => `
+        <tr>
+          <td><strong>${trDynamic(n.name)}</strong></td>
+          <td>${trDynamic(n.direction.toUpperCase())} / ${n.protocol}</td>
+          <td class="mono">${n.port}</td>
+          <td class="mono">${n.source_cidr}</td>
+          <td><span class="badge ${n.action === 'block' ? 'badge-blocked' : 'badge-allowed'}">${trDynamic(n.action.toUpperCase())}</span></td>
+          <td><span class="badge badge-ringfenced">${trDynamic(n.mode.toUpperCase())}</span></td>
+          <td style="color:var(--text-muted);">${trDynamic(n.description)}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadStorage() {
+      const res = await fetch('/api/storage');
+      const data = await res.json();
+      document.getElementById('storage-tbody').innerHTML = data.policies.map(s => `
+        <tr>
+          <td><strong>${trDynamic(s.name)}</strong></td>
+          <td>${trDynamic(s.device_type)}</td>
+          <td class="mono">${s.path_or_vendor}</td>
+          <td><span class="badge ${s.permission === 'blocked' ? 'badge-blocked' : 'badge-ringfenced'}">${trDynamic(s.permission.toUpperCase())}</span></td>
+          <td class="mono">${s.allowed_processes}</td>
+          <td><span class="badge badge-audit">${trDynamic(s.mode.toUpperCase())}</span></td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <button class="btn" onclick="updateStorage('${s.id}', 'read_only')">${t('btnReadOnly')}</button>
+              <button class="btn btn-danger" onclick="updateStorage('${s.id}', 'blocked')">${t('btnBlock')}</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function updateStorage(id, permission) {
+      await fetch('/api/storage', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id, permission, mode: 'audit'})
+      });
+      showToast(`${t('toastStorageUpdated')} ${trDynamic(permission.toUpperCase())}`);
+      loadStorage();
+    }
+
+    async function loadElevation() {
+      const res = await fetch('/api/elevation');
+      const data = await res.json();
+      document.getElementById('elevation-tbody').innerHTML = data.requests.map(r => `
+        <tr>
+          <td><strong>${r.username}</strong><br><small style="color:var(--text-muted)">${r.hostname}</small></td>
+          <td class="mono">${r.command_or_binary}</td>
+          <td>${trDynamic(r.justification)}</td>
+          <td>${r.duration_minutes} ${t('lblMinutes')}</td>
+          <td><span class="badge badge-${r.status}">${trDynamic(r.status.toUpperCase())}</span></td>
+          <td>
+            ${r.status === 'pending' ? `
+              <button class="btn btn-success" onclick="decideElevation('${r.id}', 'approved')">${t('btnApproveJit')}</button>
+              <button class="btn btn-danger" onclick="decideElevation('${r.id}', 'denied')">${t('btnDeny')}</button>
+            ` : `<small style="color:var(--text-muted)">${t('lblReviewedBy')} ${r.reviewed_by || 'Admin'}</small>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function decideElevation(id, action) {
+      await fetch('/api/elevation', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id, action})
+      });
+      showToast(`${t('toastElevationUpdated')} ${trDynamic(action.toUpperCase())}`);
+      loadElevation();
+      loadOverview();
+    }
+
+    async function createSampleElevation() {
+      const cmd = prompt(t('promptJitCmd'), "/usr/sbin/tcpdump -i any port 443");
+      if (!cmd) return;
+      await fetch('/api/elevation', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          action: 'request',
+          username: 'secops-operator',
+          hostname: 'zt-prod-node01',
+          command_or_binary: cmd,
+          justification: t('defaultJitJustification'),
+          duration_minutes: 30
+        })
+      });
+      showToast(t('toastElevationCreated'));
+      loadElevation();
+      loadOverview();
+    }
+
+    async function loadDAC() {
+      const res = await fetch('/api/dac');
+      const data = await res.json();
+      document.getElementById('dac-tbody').innerHTML = data.checks.map(c => `
+        <tr>
+          <td class="mono">${c.benchmark_id}</td>
+          <td><strong>${trDynamic(c.title)}</strong><br><small class="mono" style="color:var(--text-muted)">${t('lblRemediation')}: ${c.remediation_cmd}</small></td>
+          <td>${trDynamic(c.category)}</td>
+          <td class="mono">${trDynamic(c.current_value)}</td>
+          <td class="mono">${trDynamic(c.expected_value)}</td>
+          <td><span class="badge badge-${c.status}">${trDynamic(c.status.toUpperCase())}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadAuditLogs() {
+      const q = document.getElementById('audit-search').value;
+      const mod = document.getElementById('audit-module-filter').value;
+      const res = await fetch(`/api/audit-logs?module=${encodeURIComponent(mod)}&q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      document.getElementById('audit-full-tbody').innerHTML = data.logs.map(l => `
+        <tr>
+          <td class="mono">${l.timestamp.replace('T', ' ').slice(0, 19)}</td>
+          <td><strong>${l.hostname || ''}</strong></td>
+          <td><span class="badge badge-ringfenced">${trDynamic(l.module)}</span></td>
+          <td><span class="badge badge-${l.severity === 'critical' ? 'blocked' : l.severity === 'high' ? 'pending' : 'allowed'}">${trDynamic(l.severity.toUpperCase())}</span></td>
+          <td><strong>${trDynamic(l.action_taken)}</strong></td>
+          <td><strong>${l.process_name || ''}</strong><br><span class="mono">${l.cmdline || ''}</span></td>
+          <td style="max-width:340px;">${trDynamic(l.details || '')}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function simulateAttack(scenario) {
+      const res = await fetch('/api/simulate-attack', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({scenario})
+      });
+      const data = await res.json();
+      showToast(`${t('toastSimIntercepted')} ${trDynamic(data.event.module)} -> ${data.event.process_name}`);
+      loadOverview();
+      loadAuditLogs();
+    }
+
+    async function askCyberHero() {
+      const out = document.getElementById('cyberhero-output');
+      const promptText = document.getElementById('cyberhero-input').value;
+      out.textContent = t('chLoading');
+      const res = await fetch('/api/cyber-hero/analyze', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({prompt: promptText, lang: currentLang})
+      });
+      const data = await res.json();
+      out.textContent = `[${t('chModelPrefix')}: ${data.model}]\n\n` + data.response;
+    }
+
+    function refreshAll() {
+      loadOverview();
+      showToast(t('toastSynced'));
+    }
+
+    setLanguage(currentLang);
+    setInterval(loadOverview, 15000);
+  </script>
+</body>
+</html>
